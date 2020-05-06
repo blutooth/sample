@@ -1,0 +1,33 @@
+localhost {
+        redir /hello* https://translatum.spdns.org:2020
+
+    	reverse_proxy /* http://frontend:8080 {
+        except /socket.io
+        }
+        
+        
+}
+
+localhost:9000 {
+reverse_proxy /socket.io/* http://mysite:8000 {
+                header_up Host {http.reverse_proxy.upstream.hostport}
+                header_up X-Real-IP {http.request.remote.host}
+                header_up X-Forwarded-For {http.request.remote.host}
+                header_up X-Forwarded-Port {http.request.port}
+                header_up X-Forwarded-Proto {http.request.scheme}
+                header_up Connection Upgrade
+                header_up Upgrade websocket
+                
+
+}
+}
+
+
+
+
+https: {
+    respond * "hello!"
+}
+localhost/glioma_stars {
+    reverse_proxy * brats_starz:8080
+}
