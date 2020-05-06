@@ -1,0 +1,36 @@
+version: '3'
+services: 
+  caddy:
+    image: caddy/caddy:2-alpine
+    ports:
+
+    depends_on:
+      - mysite
+      - frontend
+    volumes:
+      - ./caddy/Cadyfile:/etc/caddy/Caddyfile
+
+  mysite:
+    restart: always
+    command: /bin/bash -c "python server.py"
+    build: 
+      context: ./mysite
+      dockerfile: dockerfile.server
+    expose:
+      - "8000"
+
+  frontend:
+    build: ./web
+    expose:
+      - "8080"
+    depends_on:
+          - mysite
+
+
+        # frontend urls
+    location / {
+      proxy_redirect off;
+      proxy_pass http://frontend;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+    }

@@ -1,0 +1,27 @@
+version: '3'
+services: 
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    depends_on:
+      - mysite
+      - frontend
+    volumes:
+      - ./nginx/dev.conf:/etc/nginx/nginx.conf:ro
+
+  mysite:
+    restart: always
+    command: /bin/bash -c "python server.py"
+    build: 
+      context: ./mysite
+      dockerfile: dockerfile.server
+    expose:
+      - "8000"
+
+  frontend:
+    build: ./web
+    ports:
+      - "8080:8080"
+    depends_on:
+          - mysite
